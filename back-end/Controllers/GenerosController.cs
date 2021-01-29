@@ -37,7 +37,7 @@ namespace PeliculasAPI.Controllers
             //var generos = await context.Generos.ToListAsync();
             var queryable =  context.Generos.AsQueryable();
             await HttpContext.InsertarParametrosPaginacionEnCabecera(queryable);
-            var generos = queryable.ToListAsync();
+            var generos = await queryable.OrderBy(x => x.Nombre).Paginar(paginacionDTO).ToListAsync();
             return mapper.Map<List<GeneroDTO>>(generos);
         }
 
