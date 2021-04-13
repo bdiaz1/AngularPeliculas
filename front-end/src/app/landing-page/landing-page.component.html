@@ -1,5 +1,16 @@
+<app-autorizado [rol]="'admin'">
+    <ng-container autorizado>
+        
+    </ng-container>
+</app-autorizado>
+
 <h2>En Cines</h2>
-<app-listado-peliculas [peliculas]="peliculasEnCines"></app-listado-peliculas>
+<app-listado-peliculas 
+(borrado)="borrado()"
+[peliculas]="peliculasEnCines"
+></app-listado-peliculas>
 
 <h2>Futuros Extrenos</h2>
-<app-listado-peliculas [peliculas]="peliculasProximas"></app-listado-peliculas>
+<app-listado-peliculas 
+(borrado)="borrado()"
+[peliculas]="peliculasProximas"></app-listado-peliculas>

@@ -1,22 +1,26 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { parseErroresAPI } from 'src/app/utilidades/utilidades';
 import { cineCreacionDTO } from '../cine';
+import { CinesService } from '../cines.service';
 
 @Component({
   selector: 'app-crear-cine',
   templateUrl: './crear-cine.component.html',
   styleUrls: ['./crear-cine.component.css']
 })
-export class CrearCineComponent implements OnInit {
+export class CrearCineComponent{
 
-  constructor(private router:Router) { }
+  errores: string[] = [];
 
-  ngOnInit(): void {
-  }
+  constructor(private router: Router, private cinesService: CinesService) { }
 
-    guardarCambios(cine: cineCreacionDTO){
+  guardarCambios(cine: cineCreacionDTO){
+    // console.log(cine);
     //...guardar los cambios
-    // this.router.navigate(['/cines']);
-    console.log(cine);
-  }
+    this.cinesService.crear(cine).subscribe(() => {
+      this.router.navigate(['/cines']);
+    }, error => this.errores = parseErroresAPI(error)
+    );    
+  }  
 }

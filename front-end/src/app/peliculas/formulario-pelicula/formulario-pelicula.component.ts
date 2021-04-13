@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { actorPeliculaDTO } from 'src/app/actores/actor';
 import { MultipleSelectorModel } from 'src/app/utilidades/selector-multiple/multipleSelectorModel';
 import { PeliculaCreacionDTO, PeliculaDTO } from '../pelicula';
 
@@ -15,28 +16,30 @@ export class FormularioPeliculaComponent implements OnInit {
   form!:FormGroup;
 
   @Input()
+  errores: string[]=[];
+
+  @Input()
   modelo!: PeliculaDTO;
 
-  generosNoSeleccionados:MultipleSelectorModel[]=[
-    {llave: 1, valor:'Drama'},
-    {llave: 2, valor:'Comedia'},
-    {llave: 3, valor:'Accion'},
-    {llave: 4, valor:'Amor'}
-  ];
+  @Input()
+  generosNoSeleccionados:MultipleSelectorModel[]=[];
 
+  @Input()
   generosSeleccionados: MultipleSelectorModel[]=[];
 
-  cinesNoSeleccionados:MultipleSelectorModel[]=[
-    {llave: 1, valor:'Neza'},
-    {llave: 2, valor:'Chalco'},
-    {llave: 3, valor:'Los reyes'},
-    {llave: 4, valor:'Benito'}
-  ];
+  @Input()
+  cinesNoSeleccionados:MultipleSelectorModel[]=[];
 
+  @Input()
   cinesSeleccionados: MultipleSelectorModel[]=[];
+
+  @Input()
+  actoresSeleccionados: actorPeliculaDTO[]=[];
 
   @Output()
   OnSubmit: EventEmitter<PeliculaCreacionDTO> = new EventEmitter<PeliculaCreacionDTO>();
+
+  imagenCambiada = false;
 
   ngOnInit(): void {
     this.form = this.formBuilder.group({
@@ -51,8 +54,9 @@ export class FormularioPeliculaComponent implements OnInit {
       trailer:'',
       fechaLanzamiento:'',
       poster:'',
-      generosId: '',
-      cinesId:''
+      generosIds: '',
+      cinesIds:'',
+      actores: ''
     });
 
     if(this.modelo !== undefined){
@@ -62,16 +66,27 @@ export class FormularioPeliculaComponent implements OnInit {
 
   guardarCambios(){
     const generosIds = this.generosSeleccionados.map(val => val.llave);
-    this.form.get('generosId')?.setValue(generosIds);
+    this.form.get('generosIds')?.setValue(generosIds);
 
     const cinesIds = this.cinesSeleccionados.map(val => val.llave);
-    this.form.get('cinesId')?.setValue(cinesIds);
+    this.form.get('cinesIds')?.setValue(cinesIds);
+
+    const actores = this.actoresSeleccionados.map(val => {
+      return {id: val.id, personaje: val.personaje};
+    })
+
+    this.form.get('actores')?.setValue(actores);
+
+    if(!this.imagenCambiada){
+      this.form.patchValue({'poster':null});
+    }
 
     this.OnSubmit.emit(this.form.value);
   }
 
   archivoSeleccionado(archivo: File){
     this.form.get('poster')?.setValue(archivo);
+    this.imagenCambiada = true;
   }
 
   changeMarkdown(texto:any){

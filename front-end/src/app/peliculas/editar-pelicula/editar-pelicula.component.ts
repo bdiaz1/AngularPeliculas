@@ -1,5 +1,9 @@
 import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
+import { actorPeliculaDTO } from 'src/app/actores/actor';
+import { MultipleSelectorModel } from 'src/app/utilidades/selector-multiple/multipleSelectorModel';
 import { PeliculaCreacionDTO, PeliculaDTO } from '../pelicula';
+import { PeliculasService } from '../peliculas.service';
 
 @Component({
   selector: 'app-editar-pelicula',
@@ -8,16 +12,48 @@ import { PeliculaCreacionDTO, PeliculaDTO } from '../pelicula';
 })
 export class EditarPeliculaComponent implements OnInit {
 
-  constructor() { }
+  constructor(private peliculasService: PeliculasService,
+    private activateRoute: ActivatedRoute,
+    private router: Router) { }
 
-  modelo:PeliculaDTO = {titulo:'spider',enCines:true,trailer: 'dsfs',resumen:'# cosa', fechaLanzamiento: new Date(),
-poster: 'https://m.media-amazon.com/images/M/MV5BZDEyN2NhMjgtMjdhNi00MmNlLWE5YTgtZGE4MzNjMTRlMGEwXkEyXkFqcGdeQXVyNDUyOTg3Njg@._V1_UX182_CR0,0,182,268_AL_.jpg'};
+  modelo!:PeliculaDTO;
 
+  generosSeleccionados!: MultipleSelectorModel[];
+  cinesSeleccionados!: MultipleSelectorModel[];
+  generosNoSeleccionados!: MultipleSelectorModel[];
+  cinesNoSeleccionados!: MultipleSelectorModel[];
+  actoresSeleccionados!: actorPeliculaDTO[];
+  
   ngOnInit(): void {
+    this.activateRoute.params.subscribe(params => {
+      this.peliculasService.putGet(params.id).subscribe(peliculaPutGet => {
+        this.modelo = peliculaPutGet.pelicula;
+
+        this.generosNoSeleccionados = peliculaPutGet.generosNoSeleccionados.map(genero => {
+          return <MultipleSelectorModel>{llave: genero.id, valor: genero.nombre};
+        });
+
+        this.cinesNoSeleccionados = peliculaPutGet.cinesNoSeleccionados.map(cine => {
+          return <MultipleSelectorModel>{llave: cine.id, valor: cine.nombre};
+        });
+
+        this.generosSeleccionados = peliculaPutGet.generosSeleccionados.map(genero => {
+          return <MultipleSelectorModel>{llave: genero.id, valor: genero.nombre};
+        });
+
+        this.cinesSeleccionados = peliculaPutGet.cinesSeleccionados.map(cine => {
+          return <MultipleSelectorModel>{llave: cine.id, valor: cine.nombre};
+        });
+
+        this.actoresSeleccionados = peliculaPutGet.actores;
+      });
+    });
   }
 
   guardarCambios(pelicula: PeliculaCreacionDTO){
-    console.log(pelicula);
+    this.peliculasService.editar(this.modelo.id,pelicula).subscribe(() =>
+      this.router.navigate(['/pelicula/' + this.modelo.id])
+    );
   }
 
 }

@@ -1,7 +1,12 @@
 import { Location } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
+import { PageEvent } from '@angular/material/paginator';
 import { ActivatedRoute } from '@angular/router';
+import { generoDTO } from 'src/app/generos/genero';
+import { GenerosService } from 'src/app/generos/generos.service';
+import { PeliculaDTO } from '../pelicula';
+import { PeliculasService } from '../peliculas.service';
 
 @Component({
   selector: 'app-filtro-peliculas',
@@ -12,58 +17,51 @@ export class FiltroPeliculasComponent implements OnInit {
 
   constructor(private formBuilder: FormBuilder,
     private location: Location,
-    private activateRoute: ActivatedRoute) { }
+    private activateRoute: ActivatedRoute,
+    private generosService: GenerosService,
+    private peliculasService: PeliculasService) { }
 
   form!: FormGroup;
-  genres = [
-    {id:1,nombre:'Drama'},
-    {id:2,nombre:'Acción'},
-    {id:3,nombre:'Comedia'}
-  ];
+  generos : generoDTO[]=[];
+  peliculas!: PeliculaDTO[];
+    paginaActual = 1;
+    cantidadElementosAMostrar = 10;
+    cantidadElementos=0;
 
-  peliculas = [
-    {title: 'Spider-Man', atTheCinema:false,nextReleases :true, genres:[1,2],poster:'https://m.media-amazon.com/images/M/MV5BZDEyN2NhMjgtMjdhNi00MmNlLWE5YTgtZGE4MzNjMTRlMGEwXkEyXkFqcGdeQXVyNDUyOTg3Njg@._V1_UX182_CR0,0,182,268_AL_.jpg'},
-    {title: 'Man of Steel', atTheCinema:false,nextReleases :false, genres:[2,3],poster:'https://m.media-amazon.com/images/M/MV5BMTk5ODk1NDkxMF5BMl5BanBnXkFtZTcwNTA5OTY0OQ@@._V1_UY209_CR0,0,140,209_AL_.jpg'},
-    {title: 'Harry Potter y las reliquias de la muerte 2', atTheCinema:true,nextReleases :false, genres:[1,3],poster:'https://m.media-amazon.com/images/M/MV5BMGVmMWNiMDktYjQ0Mi00MWIxLTk0N2UtN2ZlYTdkN2IzNDNlXkEyXkFqcGdeQXVyODE5NzE3OTE@._V1_UX140_CR0,0,140,209_AL_.jpg'}
-  ];
-
-  peliculasOriginal = this.peliculas;
 
   formularioOriginal = {
-      title: '',
-      genreId: 0,
-      nextReleases: false,
-      atTheCinema: false
+      titulo: '',
+      generoId: 0,
+      proximosEstrenos: false,
+      enCines: false
     };
 
   ngOnInit(): void {
-    this.form = this.formBuilder.group(this.formularioOriginal);
-    this.leerValoresURL();
-    this.buscarPeliculas(this.form.value);
 
-    this.form.valueChanges.subscribe( valores => {
-      this.peliculas = this.peliculasOriginal;
-      this.buscarPeliculas(valores);
-      this.escribirParametrosbusquedaEnURL();
+    this.generosService.obtenerTodos().subscribe( generos => {
+      this.generos = generos;
+
+      this.form = this.formBuilder.group(this.formularioOriginal);
+      this.leerValoresURL();
+      this.buscarPeliculas(this.form.value);
+
+      this.form.valueChanges.subscribe( valores => {
+        this.buscarPeliculas(valores);
+        this.escribirParametrosbusquedaEnURL();
+      });
     });
+
+    
   }
 
   buscarPeliculas(valores: any){
-    if(valores.title){
-    this.peliculas = this.peliculas.filter(pelicula => pelicula.title.indexOf(valores.title) !== -1);
-    }
-
-    if(valores.genreId){
-    this.peliculas = this.peliculas.filter(pelicula => pelicula.genres.indexOf(valores.genreId) !== -1);
-    }
-
-    if(valores.nextReleases){
-      this.peliculas = this.peliculas.filter(pelicula => pelicula.nextReleases);
-    }
-
-    if(valores.atTheCinema){
-      this.peliculas = this.peliculas.filter(pelicula => pelicula.atTheCinema);
-    }
+    valores.pagina = this.paginaActual;
+    valores.recordsPorPagina = this.cantidadElementosAMostrar;
+   this.peliculasService.filtrar(valores).subscribe(response => {
+     this.peliculas = response.body;
+     this.escribirParametrosbusquedaEnURL();
+     this.cantidadElementos = response.headers.get('cantidadTotalRegistros');
+   })
   }
 
   limpiar(){
@@ -75,20 +73,20 @@ export class FiltroPeliculasComponent implements OnInit {
 
     var valoresFormulario = this.form.value;
 
-    if(valoresFormulario.title){
-      queryStrings.push(`titulo=${valoresFormulario.title}`);
+    if(valoresFormulario.titulo){
+      queryStrings.push(`titulo=${valoresFormulario.titulo}`);
     }
 
-    if(valoresFormulario.genreId != 0){
-      queryStrings.push(`generoId=${valoresFormulario.genreId}`);
+    if(valoresFormulario.generoId != 0){
+      queryStrings.push(`generoId=${valoresFormulario.generoId}`);
     }
 
-    if(valoresFormulario.nextReleases){
-      queryStrings.push(`proximosEstrenos=${valoresFormulario.nextReleases}`);
+    if(valoresFormulario.proximosEstrenos){
+      queryStrings.push(`proximosEstrenos=${valoresFormulario.proximosEstrenos}`);
     }
 
-    if(valoresFormulario.atTheCinema){
-      queryStrings.push(`enCines=${valoresFormulario.atTheCinema}`);
+    if(valoresFormulario.enCines){
+      queryStrings.push(`enCines=${valoresFormulario.enCines}`);
     }
 
     this.location.replaceState('peliculas/buscar',queryStrings.join('&'));
@@ -113,8 +111,13 @@ export class FiltroPeliculasComponent implements OnInit {
       if(params.enCines){
         objeto.atTheCinema = params.enCines;
       }
-      console.log(objeto);
        this.form.patchValue(objeto);
     });
+  }
+
+  paginatorUpdate(datos: PageEvent){
+    this.paginaActual = datos.pageIndex + 1;
+    this.cantidadElementosAMostrar = datos.pageSize;
+    this.buscarPeliculas(this.form.value);
   }
 }

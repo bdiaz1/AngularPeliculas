@@ -16,6 +16,13 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using AutoMapper;
+using PeliculasAPI.Utilidades;
+using NetTopologySuite.Geometries;
+using NetTopologySuite;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace PeliculasAPI
 {
@@ -23,6 +30,7 @@ namespace PeliculasAPI
     {
         public Startup(IConfiguration configuration)
         {
+            JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
             Configuration = configuration;
         }
 
@@ -33,8 +41,22 @@ namespace PeliculasAPI
         {
             services.AddAutoMapper(typeof(Startup));
 
-            services.AddDbContext<ApplicationDbContext>(
-                options => options.UseSqlServer(Configuration.GetConnectionString("defaultConnection")));
+            services.AddSingleton<GeometryFactory>(NtsGeometryServices.Instance.CreateGeometryFactory(srid: 4326));
+
+            services.AddSingleton(provider =>
+                new MapperConfiguration(config =>
+                {
+                    var geometryFactory = provider.GetRequiredService<GeometryFactory>();
+                    config.AddProfile(new AutoMapperProfiles(geometryFactory));
+                }).CreateMapper());
+
+            services.AddTransient<IAlmacenadorArchivos, AlmacenadorArchivosLocal>();
+
+            services.AddHttpContextAccessor();
+
+            services.AddDbContext<ApplicationDbContext>(options => 
+            options.UseSqlServer(Configuration.GetConnectionString("defaultConnection"), 
+            sqlServer => sqlServer.UseNetTopologySuite()));            
 
             services.AddCors(options =>
             {
@@ -42,12 +64,33 @@ namespace PeliculasAPI
                 options.AddDefaultPolicy(builder =>
                 {
                     builder.WithOrigins(frontend_url).AllowAnyMethod().AllowAnyHeader()
-                    .WithExposedHeaders(new string[] {"cantidadTotalRegistros"});
+                    .WithExposedHeaders(new string[] { "cantidadTotalRegistros" });
                 });
 
             });
 
-            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer();
+            services.AddIdentity<IdentityUser, IdentityRole>()
+                .AddEntityFrameworkStores<ApplicationDbContext>()
+                .AddDefaultTokenProviders();
+
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(opciones =>
+                        opciones.TokenValidationParameters = new TokenValidationParameters
+                        {
+                            ValidateIssuer = false,
+                            ValidateAudience = false,
+                            ValidateLifetime = false,
+                            ValidateIssuerSigningKey = true,
+                            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["llavejwt"])),
+                            ClockSkew = TimeSpan.Zero
+                        }
+                    );
+
+            services.AddAuthorization(opciones =>
+            {
+                opciones.AddPolicy("EsAdmin", policy => policy.RequireClaim("role", "admin"));
+            });
+
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
@@ -68,6 +111,8 @@ namespace PeliculasAPI
             }
 
             app.UseHttpsRedirection();
+
+            app.UseStaticFiles();
 
             app.UseRouting();
 

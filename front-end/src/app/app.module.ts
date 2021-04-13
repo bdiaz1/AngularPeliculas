@@ -1,6 +1,6 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
-import {HttpClientModule} from '@angular/common/http';
+import {HttpClientModule, HTTP_INTERCEPTORS} from '@angular/common/http';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -12,6 +12,7 @@ import {MarkdownModule} from 'ngx-markdown';
 import {LeafletModule} from '@asymmetrik/ngx-leaflet';
 import "leaflet/dist/images/marker-shadow.png";
 import "leaflet/dist/images/marker-icon-2x.png";
+import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 
 import {MaterialModule} from './material/material.module';
 import { MenuComponent } from './menu/menu.component';
@@ -39,6 +40,13 @@ import { FormularioPeliculaComponent } from './peliculas/formulario-pelicula/for
 import { SelectorMultipleComponent } from './utilidades/selector-multiple/selector-multiple.component';
 import { AutocompleteActoresComponent } from './actores/autocomplete-actores/autocomplete-actores.component';
 import { MostrarErroresComponent } from './utilidades/mostrar-errores/mostrar-errores.component';
+import { DetallePeliculaComponent } from './peliculas/detalle-pelicula/detalle-pelicula.component';
+import { AutorizadoComponent } from './seguridad/autorizado/autorizado.component';
+import { LoginComponent } from './seguridad/login/login.component';
+import { RegistroComponent } from './seguridad/registro/registro.component';
+import { FormularioAutenticacionComponent } from './seguridad/formulario-autenticacion/formulario-autenticacion.component';
+import { SeguridadInterceptionService } from './seguridad/seguridad-interception.service';
+import { IndiceUsuariosComponent } from './seguridad/indice-usuarios/indice-usuarios.component';
 // import { CicloDeVidaComponent } from './ciclo-de-vida/ciclo-de-vida.component'
 
 @NgModule({
@@ -70,7 +78,13 @@ import { MostrarErroresComponent } from './utilidades/mostrar-errores/mostrar-er
     FormularioPeliculaComponent,
     SelectorMultipleComponent,
     AutocompleteActoresComponent,
-    MostrarErroresComponent
+    MostrarErroresComponent,
+    DetallePeliculaComponent,
+    AutorizadoComponent,
+    LoginComponent,
+    RegistroComponent,
+    FormularioAutenticacionComponent,
+    IndiceUsuariosComponent
     // CicloDeVidaComponent
   ],
   imports: [
@@ -82,9 +96,14 @@ import { MostrarErroresComponent } from './utilidades/mostrar-errores/mostrar-er
     ReactiveFormsModule,
     LeafletModule,
     HttpClientModule,
-    MarkdownModule.forRoot()
+    MarkdownModule.forRoot(),
+    SweetAlert2Module.forRoot()
   ],
-  providers: [],
+  providers: [{
+    provide: HTTP_INTERCEPTORS,
+    useClass: SeguridadInterceptionService,
+    multi: true
+  }],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

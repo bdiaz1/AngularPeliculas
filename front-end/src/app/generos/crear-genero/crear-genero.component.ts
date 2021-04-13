@@ -23,7 +23,5 @@ export class CrearGeneroComponent{
       this.router.navigate(['/generos']);
     }, error => this.errores = parseErroresAPI(error)
     );    
-  }
-
-  
+  }  
 }

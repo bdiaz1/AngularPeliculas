@@ -9,6 +9,9 @@
         <mat-icon>search</mat-icon>Buscar peliculas
     </a>
 </div>
+
+<app-autorizado [rol]="'admin'">
+    <ng-container autorizado>
 <div>
     <a mat-button routerLink="generos">Géneros</a>
 </div>
@@ -16,9 +19,27 @@
     <a mat-button routerLink="actores">Actores</a>
 </div>
 <div>
-    <a mat-button routerLink="cines">cines</a>
+    <a mat-button routerLink="cines">Cines</a>
 </div>
 <div>
     <a mat-button routerLink="peliculas/crear">Crear Pelicula</a>
 </div>
+<div>
+    <a mat-button routerLink="usuarios">Usuarios</a>
+</div>
+    </ng-container>
+</app-autorizado>
+
+<div class="espacio"></div>
+
+<app-autorizado>
+    <ng-container autorizado>
+        <span>Hola, {{seguridadService.obtnerCampoJWT('email')}} </span>
+        <a mat-button (click)="cerrarSeccion()">logout</a>
+    </ng-container>
+    <ng-container noAutorizado>
+        <a mat-button routerLink="login">Login</a>
+        <a mat-button routerLink="registro">Registro</a>
+    </ng-container>
+</app-autorizado>
 </mat-toolbar>

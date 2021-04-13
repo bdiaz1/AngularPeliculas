@@ -61,3 +61,13 @@ F:\Cursos\ASP Y Angular\AngularPeliculas\back-end\bin\Debug\net5.0\runtimes\win\
 F:\Cursos\ASP Y Angular\AngularPeliculas\back-end\bin\Debug\net5.0\runtimes\win\lib\netstandard2.0\System.Security.Cryptography.ProtectedData.dll
 F:\Cursos\ASP Y Angular\AngularPeliculas\back-end\bin\Debug\net5.0\AutoMapper.dll
 F:\Cursos\ASP Y Angular\AngularPeliculas\back-end\bin\Debug\net5.0\AutoMapper.Extensions.Microsoft.DependencyInjection.dll
+F:\Cursos\ASP Y Angular\AngularPeliculas\back-end\bin\Debug\net5.0\Microsoft.EntityFrameworkCore.SqlServer.NetTopologySuite.dll
+F:\Cursos\ASP Y Angular\AngularPeliculas\back-end\bin\Debug\net5.0\NetTopologySuite.dll
+F:\Cursos\ASP Y Angular\AngularPeliculas\back-end\bin\Debug\net5.0\NetTopologySuite.IO.SqlServerBytes.dll
+F:\Cursos\ASP Y Angular\AngularPeliculas\back-end\obj\Debug\net5.0\EFCoreSqlServerNetTopologySuite.cs
+F:\Cursos\ASP Y Angular\AngularPeliculas\back-end\bin\Debug\net5.0\Newtonsoft.Json.dll
+F:\Cursos\ASP Y Angular\AngularPeliculas\back-end\bin\Debug\net5.0\Microsoft.AspNetCore.Cryptography.Internal.dll
+F:\Cursos\ASP Y Angular\AngularPeliculas\back-end\bin\Debug\net5.0\Microsoft.AspNetCore.Cryptography.KeyDerivation.dll
+F:\Cursos\ASP Y Angular\AngularPeliculas\back-end\bin\Debug\net5.0\Microsoft.AspNetCore.Identity.EntityFrameworkCore.dll
+F:\Cursos\ASP Y Angular\AngularPeliculas\back-end\bin\Debug\net5.0\Microsoft.Extensions.Identity.Core.dll
+F:\Cursos\ASP Y Angular\AngularPeliculas\back-end\bin\Debug\net5.0\Microsoft.Extensions.Identity.Stores.dll

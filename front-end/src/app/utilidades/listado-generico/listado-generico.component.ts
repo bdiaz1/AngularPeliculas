@@ -1,4 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
+import { PeliculaDTO } from 'src/app/peliculas/pelicula';
 
 @Component({
   selector: 'app-listado-generico',
@@ -8,7 +9,7 @@ import { Component, Input, OnInit } from '@angular/core';
 export class ListadoGenericoComponent implements OnInit {
 
   @Input()
-  listado: { title: string; launchDate: Date; price: number; }[] | undefined;
+  listado!: PeliculaDTO[];
 
   constructor() { }
 

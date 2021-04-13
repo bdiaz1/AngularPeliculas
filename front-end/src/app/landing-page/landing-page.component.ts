@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { PeliculaDTO } from '../peliculas/pelicula';
+import { PeliculasService } from '../peliculas/peliculas.service';
 
 @Component({
   selector: 'app-landing-page',
@@ -7,22 +9,13 @@ import { Component, OnInit } from '@angular/core';
 })
 export class LandingPageComponent implements OnInit {
 
-  constructor() { }
+  constructor(private peliculasService: PeliculasService) { }
 
-ngOnInit(): void {
-      this.peliculasEnCines = [{
-        title: 'Spider-Man Home Coming',
-        launchDate: new Date(),
-        price: 1400.98,
-        poster: 'https://i.pinimg.com/originals/5c/4e/f9/5c4ef91ea10d83196d89cf2aa7a02728.jpg'
-      },{
-        title: 'Moana',
-        launchDate: new Date('2016-11-14'),
-        price: 300.98,
-        poster: 'https://i.pinimg.com/originals/e0/ae/48/e0ae489f31577f6c185ee9b13f39582c.jpg'
-      }];
+  peliculasEnCines!: PeliculaDTO[];
+  peliculasProximas!: PeliculaDTO[];
 
-      this.peliculasProximas = [];
+  ngOnInit(): void {
+      this.cargarDatos();
       // this.peliculasProximas = [{
       //   title: 'Spider-Man',
       //   launchDate: new Date(),
@@ -34,8 +27,14 @@ ngOnInit(): void {
       // }];
   }
 
-  peliculasEnCines: { title: string; launchDate: Date; price: number; poster:string; }[] | undefined;
-  peliculasProximas: { title: string; launchDate: Date; price: number;poster:string; }[] | undefined;
+  cargarDatos(){
+    this.peliculasService.ObtenerLandingpage().subscribe(landingPage => {
+        this.peliculasEnCines = landingPage.enCines;
+        this.peliculasProximas = landingPage.proximosEstrenos;
+      });
+  }
 
-
+  borrado(){
+    this.cargarDatos();
+  }
 }

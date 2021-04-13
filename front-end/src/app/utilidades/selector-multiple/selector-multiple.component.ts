@@ -32,11 +32,13 @@ export class SelectorMultipleComponent implements OnInit {
   seleccionar(item:MultipleSelectorModel, index: number){
     this.seleccionados.push(item);
     this.noSeleccionados.splice(index,1);
+    console.log({noseleccionadp : this.noSeleccionados, seleccionados :this.seleccionados});
   }
 
   deSeleccionar(item:MultipleSelectorModel, index: number){
     this.noSeleccionados.push(item);
     this.seleccionados.splice(index,1);
+    console.log({noseleccionadp : this.noSeleccionados, seleccionados :this.seleccionados});
   }
 
 }
